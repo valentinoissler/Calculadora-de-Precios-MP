@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Costos MP">
+<meta name="theme-color" content="#185FA5">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Costos MP</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #ffffff; --bg-secondary: #f5f5f4;
+    --text: #1a1a1a; --text-secondary: #6b6b6b;
+    --border: rgba(0,0,0,0.12); --border-secondary: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --blue: #185FA5; --blue-bg: #E6F1FB; --blue-text: #185FA5;
+    --amber-bg: #FAEEDA; --amber-text: #854F0B;
+    --red: #E24B4A; --red-bg: #FCEBEB; --red-text: #A32D2D;
+    --green: #1D9E75; --green-bg: #EAF3DE; --green-text: #3B6D11;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg-secondary: #252523;
+      --text: #f0ede8; --text-secondary: #9e9b95;
+      --border: rgba(255,255,255,0.1); --border-secondary: rgba(255,255,255,0.2);
+      --blue: #85B7EB; --blue-bg: #042C53; --blue-text: #85B7EB;
+      --amber-bg: #412402; --amber-text: #FAC775;
+      --red-bg: #501313; --red-text: #F09595;
+      --green-bg: #173404; --green-text: #C0DD97;
+    }
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: env(safe-area-inset-top, 16px) 16px env(safe-area-inset-bottom, 16px);
+    padding-top: max(env(safe-area-inset-top), 16px);
+    overflow-x: hidden;
+  }
+  .container { max-width: 600px; margin: 0 auto; padding-bottom: 2rem; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 2px; }
+  .sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 1rem; }
+  .section { margin-bottom: 1.25rem; }
+  .section-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 360px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 10px 12px; }
+  .card-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+  .card-value { font-size: 20px; font-weight: 600; }
+  .card-sub { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+  .card.highlight { border: 1.5px solid var(--blue); }
+  .card.danger { border: 1.5px solid var(--red); }
+  .card.success { border: 1.5px solid var(--green); }
+  select, input[type=number] {
+    width: 100%; padding: 12px 12px;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    background: var(--bg); color: var(--text);
+    font-size: 16px; outline: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  input[type=number] { font-size: 20px; font-weight: 600; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+  .breakdown { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 2px 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; gap: 8px; }
+  .row:last-child { border-bottom: none; }
+  .row .k { color: var(--text-secondary); flex: 1; }
+  .row .v { font-weight: 600; white-space: nowrap; }
+  .row.neg .v { color: var(--red); }
+  .row.bold .k { color: var(--text); font-size: 15px; font-weight: 600; }
+  .row.bold .v { font-size: 15px; }
+  .formula-box { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px 14px; margin-top: 8px; }
+  .formula-box .ftitle { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .formula { font-family: 'Courier New', monospace; font-size: 12px; color: var(--text); line-height: 1.9; }
+  .note { font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-info { background: var(--blue-bg); color: var(--blue-text); }
+  .badge-warn { background: var(--amber-bg); color: var(--amber-text); }
+  .badge-danger { background: var(--red-bg); color: var(--red-text); }
+  .badge-ok { background: var(--green-bg); color: var(--green-text); }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 8px 8px; border-bottom: 0.5px solid var(--border-secondary); font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+  td { padding: 8px 8px; border-bottom: 0.5px solid var(--border); color: var(--text); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr.verified td { background: var(--green-bg); }
+  .alert-box { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 10px 12px; margin-top: 10px; font-size: 12px; line-height: 1.8; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border-secondary); background: var(--bg); color: var(--text-secondary); white-space: nowrap; transition: all 0.15s; user-select: none; -webkit-user-select: none; }
+  .tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .info-banner { background: var(--blue-bg); color: var(--blue-text); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; margin-bottom: 1.25rem; line-height: 1.6; }
+  .error-c { color: var(--red); font-weight: 600; }
+  .ok-c { color: var(--green); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Costos Mercado Pago</h1>
+  <p class="sub">Tarjeta de crédito · Al instante · Con IVA incluido</p>
+
+  <div class="info-banner">
+    Los costos publicados por MP <strong>no incluyen IVA (21%)</strong>. Esta calculadora usa los valores reales verificados con cobros reales.
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('calc')">Calculadora</div>
+    <div class="tab" onclick="switchTab('tabla')">Tabla</div>
+    <div class="tab" onclick="switchTab('formula')">Fórmulas</div>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div id="panel-calc" class="panel active">
+    <div class="section">
+      <div class="grid2">
+        <div>
+          <label>Precio base que querés recibir $</label>
+          <input type="number" id="precio" value="100000" inputmode="numeric" oninput="calcular()" />
+        </div>
+        <div>
+          <label>Cuotas ofrecidas</label>
+          <select id="cuotas" onchange="calcular()">
+            <option value="1">1 cuota</option>
+            <option value="2">Hasta 2</option>
+            <option value="3" selected>Hasta 3</option>
+            <option value="6">Hasta 6</option>
+            <option value="9">Hasta 9</option>
+            <option value="12">Hasta 12</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Desglose del cobro</div>
+      <div class="breakdown">
+        <div class="row"><span class="k">Pago del cliente</span><span class="v" id="r-pago">—</span></div>
+        <div class="row neg"><span class="k" id="k-intereses">Intereses absorbidos</span><span class="v" id="r-intereses">—</span></div>
+        <div class="row neg"><span class="k">Cargo MP real (6,10%)</span><span class="v" id="r-mp">—</span></div>
+        <div class="row bold"><span class="k">Recibís vos</span><span class="v" id="r-total">—</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="grid3">
+        <div class="card danger">
+          <div class="card-label">Costo real</div>
+          <div class="card-value" id="c-pct">—</div>
+          <div class="card-sub">sobre cobrado</div>
+        </div>
+        <div class="card highlight">
+          <div class="card-label">Recargo</div>
+          <div class="card-value" id="c-markup">—</div>
+          <div class="card-sub">al precio base</div>
+        </div>
+        <div class="card success">
+          <div class="card-label">Publicar a</div>
+          <div class="card-value" id="c-precio-pub">—</div>
+          <div class="card-sub">precio final</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="ftitle">Precio a publicar</div>
+      <div class="formula" id="formula-live"></div>
+    </div>
+    <p class="note">* Verificado con cobros reales en 3 y 6 cuotas. Puede haber pequeñas variaciones por retenciones provinciales.</p>
+  </div>
+
+  <!-- TABLA -->
+  <div id="panel-tabla" class="panel">
+    <div class="section-title" style="margin-bottom:10px;">Costos reales · IVA incluido</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cuotas</th>
+            <th>Int. c/IVA</th>
+            <th>MP real</th>
+            <th>Total real</th>
+            <th>Recargo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 cuota</td><td>0,00%</td><td>6,10%</td><td><span class="badge badge-info">6,10%</span></td><td>+6,50%</td></tr>
+          <tr><td>Hasta 2</td><td>12,09%</td><td>6,10%</td><td><span class="badge badge-warn">18,19%</span></td><td>+22,23%</td></tr>
+          <tr class="verified"><td>Hasta 3 ✓</td><td>7,87%</td><td>6,10%</td><td><span class="badge badge-warn">13,97%</span></td><td>+16,24%</td></tr>
+          <tr class="verified"><td>Hasta 6 ✓</td><td>13,92%</td><td>6,10%</td><td><span class="badge badge-danger">20,02%</span></td><td>+25,03%</td></tr>
+          <tr><td>Hasta 9</td><td>20,57%</td><td>6,10%</td><td><span class="badge badge-danger">26,67%</span></td><td>+36,39%</td></tr>
+          <tr><td>Hasta 12</td><td>25,41%</td><td>6,10%</td><td><span class="badge badge-danger">31,51%</span></td><td>+45,99%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert-box">
+      Filas con <span class="ok-c">✓</span> verificadas con cobros reales. Las demás se calculan con IVA 21% sobre tarifas publicadas.
+    </div>
+  </div>
+
+  <!-- FÓRMULAS -->
+  <div id="panel-formula" class="panel">
+    <div class="section">
+      <div class="formula-box">
+        <div class="ftitle">Por qué los costos publicados no alcanzan</div>
+        <div class="formula">
+Int. reales  = Int. publicados × 1,21<br>
+Cargo MP     = 5,04% × 1,21 = 6,10%<br><br>
+Costo total  = Int. reales + 6,10%<br>
+Precio pub.  = Base ÷ (1 − Costo total)<br>
+Recargo %    = (1 ÷ (1 − Costo)) − 1
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Ejemplos verificados</div>
+      <div class="breakdown">
+        <div class="row"><span class="k">3 cuotas (13,97%)</span><span class="v">$100k → publicar $116.240</span></div>
+        <div class="row"><span class="k">6 cuotas (20,02%)</span><span class="v">$100k → publicar $125.031</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="alert-box">
+        <span class="error-c">✗ Incorrecto:</span> $100k × 1,1397 = $113.970 → recibís menos<br><br>
+        <span class="ok-c">✓ Correcto:</span> $100k ÷ 0,8603 = $116.240 → recibís exactamente tu base
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const IVA = 1.21;
+const cargoMPReal = 5.04 * IVA / 100;
+const interesesPublicados = { 1: 0, 2: 9.99, 3: 6.50, 6: 11.50, 9: 17.00, 12: 21.00 };
+
+function fmt(n) { return '$\u00a0' + Math.round(n).toLocaleString('es-AR'); }
+function pct(n) { return n.toFixed(2).replace('.', ',') + '%'; }
+
+function calcular() {
+  const precioBase = parseFloat(document.getElementById('precio').value) || 0;
+  const cuotas = parseInt(document.getElementById('cuotas').value);
+  const intReal = (interesesPublicados[cuotas] * IVA) / 100;
+  const totalCost = intReal + cargoMPReal;
+  const recargoPct = (1 / (1 - totalCost)) - 1;
+  const precioPublicar = precioBase / (1 - totalCost);
+  const intereses = precioPublicar * intReal;
+  const cargo = precioPublicar * cargoMPReal;
+  const cuotaAprox = precioPublicar / cuotas;
+
+  document.getElementById('r-pago').textContent = fmt(precioPublicar);
+  document.getElementById('r-intereses').textContent = '- ' + fmt(intereses);
+  document.getElementById('r-mp').textContent = '- ' + fmt(cargo);
+  document.getElementById('r-total').textContent = fmt(precioBase);
+  document.getElementById('k-intereses').textContent = 'Intereses c/IVA (' + pct(intReal * 100) + ')';
+  document.getElementById('c-pct').textContent = pct(totalCost * 100);
+  document.getElementById('c-markup').textContent = '+' + pct(recargoPct * 100);
+  document.getElementById('c-precio-pub').textContent = fmt(precioPublicar);
+  document.getElementById('formula-live').innerHTML =
+    fmt(precioBase) + ' ÷ (1 − ' + pct(totalCost * 100) + ')<br>' +
+    '= ' + fmt(precioBase) + ' ÷ ' + (1 - totalCost).toFixed(4) + '<br>' +
+    '= <strong>' + fmt(precioPublicar) + '</strong>' +
+    (cuotas > 1 ? '&nbsp;&nbsp;(' + fmt(cuotaAprox) + ' × ' + cuotas + ')' : '');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['calc','tabla','formula'][i] === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+calcular();
+</script>
+</body>
+</html>
