@@ -1,0 +1,14 @@
+{
+  "name": "Calculadora de Precios MP",
+  "short_name": "Precios MP",
+  "description": "Precio a cobrar en Mercado Pago para recibir un monto exacto",
+  "start_url": "/Calculadora-de-Precios-MP/",
+  "scope": "/Calculadora-de-Precios-MP/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1f5fae",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
